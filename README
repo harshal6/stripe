@@ -1,4 +1,4 @@
-================== Stripe For Championship Program ================================================================================================================================================================================
+================== Stripe For Championship Program =============================
 1. Move Sample.Config.php to Config.php.
 2. Update the Config.php with appropriate Stripe credentials, Database Credentials,Product's Price Ids(see point 9) and Return URL
 3. To Create Account visit /create-account
