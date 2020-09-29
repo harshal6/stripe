@@ -1,0 +1,16 @@
+{
+    "name": "harshalpradhan/stripe_project",
+    "description": "To Build Championship Program using Stripe",
+    "type": "project",
+    "require": {
+        "stripe/stripe-php": "^7.9"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Harshal",
+            "email": "harshal.a.pradhan@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
