@@ -1,10 +1,12 @@
 ================== Stripe For Championship Program ================================================================================================================================================================================
 1.a  Move Sample.Config.php to Config.php.
 1.b  Run composer install
-2. Update the Config.php with appropriate Stripe credentials, Database Credentials,Product's Price Ids(see point 9) and Return URL
+2. Update the Config.php with appropriate Stripe credentials, Database Credentials,Product's Price Ids(see point 9) 
+   and Return URL
 3. To Create Account visit /create-account
 4. To manage billing of logged in user go to /user/manage-billing [Under development]
-5. To update subscription status periodically execute /admin/subscription-updates/updateSubscriptionStatus.php or visit /admin/subscription-updates [ Under development]
+5. To update subscription status periodically execute /admin/subscription-updates/updateSubscriptionStatus.php or
+    visit /admin/subscription-updates [ Under development]
 6. when you receive an error entered field values are not retained, need to set default values [Under development]
 7. TODO: to add	field validations for the create account.
 8. tempaccounts table as supplied
@@ -17,11 +19,13 @@
      payment_type => VARCHAR
      account_type => TEXT (can be changed to boolean and code will need to be updated slightly)
      created => INT
-9. Two Products needs to be created on the Stripe Dashboard https://dashboard.stripe.com/test/products [for test environment]  [While moving to live mode, you have an option to "Copy to Live"]
+9. Two Products needs to be created on the Stripe Dashboard https://dashboard.stripe.com/test/products [for test environment] 
+   [While moving to live mode, you have an option to "Copy to Live"]
   1.  Product Individual
    Pricing 450/year Recurring [Price Id generated needs to be updated in the Config.php]
   2.  Product Combined
    Pricing 799/year Recurring [Price Id generated needs to be updated in the Config.php]
-10. TODO: whenever price is updated in Product (stripe dashboard) , it will need to be updated in html (In future can be dynamically fetched but can affect page load time so it can be better to keep updating the html manually)
+10. TODO: whenever price is updated in Product (stripe dashboard) , it will need to be updated in html (In future
+    can be dynamically fetched but can affect page load time so it can be better to keep updating the html manually)
 ==================================================================================================================================================================================================================================
    
