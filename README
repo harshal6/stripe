@@ -1,5 +1,6 @@
 ================== Stripe For Championship Program ================================================================================================================================================================================
-1. Move Sample.Config.php to Config.php.
+1.a  Move Sample.Config.php to Config.php.
+1.b  Run composer install
 2. Update the Config.php with appropriate Stripe credentials, Database Credentials,Product's Price Ids(see point 9) and Return URL
 3. To Create Account visit /create-account
 4. To manage billing of logged in user go to /user/manage-billing [Under development]

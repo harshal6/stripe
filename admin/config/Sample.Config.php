@@ -1,6 +1,6 @@
 <?php
-require_once('../vendor/stripe/stripe-php/init.php');
-require_once('../vendor/autoload.php');
+require_once('../../vendor/stripe/stripe-php/init.php');
+require_once('../../vendor/autoload.php');
 
 $stripe = [
   "secret_key"      => "sk_test_l6yur5CeuWLl7aoh49ML1hrZ",
