@@ -18,6 +18,7 @@ class Database {
 	private $db;
 	private $error;
 	private $stmt;
+	private $dbh;
 	
 	public function __construct() {
 	   $this->config = new Config();
