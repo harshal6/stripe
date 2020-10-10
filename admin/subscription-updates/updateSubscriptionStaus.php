@@ -1,13 +1,11 @@
 <?php
-
 require_once('../../vendor/autoload.php');
-require_once('../../lib/pdo_db.php');
-require_once('../../vendor/stripe/stripe-php/init.php');
-require_once('../config/Config.php');
 
+use Stripe\StripeClient;
+use StripePayment\Customer\Customer;
 
-$stripe_object = new \Stripe\StripeClient(
-    $stripe['secret_key']
+$stripe_object = new StripeClient(
+    STRIPE_SECRET_KEY
 );
 
 
@@ -18,9 +16,8 @@ $all = $customer->getCustomers();
 //get subscription ids for each and eventually status
 foreach($all as $key => $value) {
     $customer_id = $value->customer_id;
-    $subscription = $stripe->subscriptions->all(
-        'customer' => $customer_id,
-        []
+    $subscription = $stripe_object->subscriptions->all(
+        'customer' => $customer_id
     );
     $status = $subscription->status;
     //update customers with the status

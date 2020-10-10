@@ -1,15 +1,18 @@
 <?php
 require_once('../vendor/autoload.php');
-require_once('../lib/pdo_db.php');
-require_once('../vendor/stripe/stripe-php/init.php');
-require_once('./Customer.php');
 require_once('../admin/config/Config.php');
+require_once('../stripe-payment/Customer.php');
 
+use StripePayment\Customer\Customer;
+use Stripe\Customer as StripeCustomer;
+use Stripe\Token;
+use Stripe\Subscription;
 
 
 // @todo Jquery validation for fields.
 
-
+$config = new Admin\Config\Config;
+$config->setApiKey($config->stripeKeys()['stripe_secret_key']);
 // sanitize Post array.
 $POST = filter_var_array($_POST, FILTER_SANITIZE_STRING);
 
@@ -68,9 +71,9 @@ if (isset($POST['payment'])) {
 if (isset($POST['plan_type'])) {
   $plan_type = $POST['plan_type'];
   if ($plan_type == "Individual") {
-    $plan_type = $product_price_ids['individual'];
+    $plan_type = $config->productId()['individual'];
   } else {
-    $plan_type = $product_price_ids['combo'];
+    $plan_type = $config->productId()['combo'];
   }
 }
 
@@ -94,7 +97,7 @@ if ($paymentType == 'cc') {
     $token =  generateToken($card_number, $expiry_month, $expiry_year, $cvc);
 
     // Create Customer In Stripe
-    $customer = \Stripe\Customer::create([
+    $customer = StripeCustomer::create([
       "email" => $email,
       "name" => $name,
       "source" => $token->id
@@ -102,24 +105,21 @@ if ($paymentType == 'cc') {
     
     // Create a manage-billing.
     $subscription =  createSubscriptionForAutoCollection($customer->id, $plan_type, $promo);
-
-    // Customer Data
-    $customerData = customerData ($subscription->customer, $name, $email, $subscription->status ,$paymentType, $type, $subscription->created);
-
-    // Instantiate Customer
-    $customer = new Customer();
-
-    // Add new customer
-    $customer->addCustomer($customerData);
+    if ($POST['plan_type'] == "Individual") {
+        // Customer Data
+        $customerData = customerData($subscription->customer, $name, $email, $subscription->status, $paymentType, $type, $subscription->created);
+        // Instantiate Customer
+        $customer = new Customer();
+        // Add new customer
+        $customer->addCustomer($customerData);
+    }
     if ($POST['plan_type'] == "Combined") {
-      if ($type == 'girl') {
-          $customerData = customerData ($subscription->customer, $bname, $bemail, $subscription->status ,$paymentType, $type, $subscription->created);
-          $customer->addCustomer($customerData);
-      }
-      if ($type == 'boy') {
-          $customerData = customerData ($subscription->customer, $gname, $gemail, $subscription->status ,$paymentType, $type, $subscription->created);
-          $customer->addCustomer($customerData);
-      }
+      $customer = new Customer();
+      $customerData = customerData($subscription->customer, $bname, $bemail, $subscription->status ,$paymentType, 'boy', $subscription->created);
+      $customer->addCustomer($customerData);
+      $customer = new Customer();
+      $customerData = customerData($subscription->customer, $gname, $gemail, $subscription->status ,$paymentType, 'girl', $subscription->created);
+      $customer->addCustomer($customerData);
     }
 
       /**
@@ -181,7 +181,7 @@ function customerData ($customerID, $name, $email, $status, $paymentType, $type,
 
 // Create Customer In Stripe
 function createCustomer($email, $name) {
-  $customer = \Stripe\Customer::create([
+  $customer = StripeCustomer::create([
     "email" => $email,
     "name" => $name,
   ]);
@@ -190,7 +190,7 @@ function createCustomer($email, $name) {
 
 // Generate Token with cardDetails.
 function generateToken($card_number, $expiry_month, $expiry_year, $cvc) {
-  $token = \Stripe\Token::create([
+  $token = Token::create([
     'card' => [
       'number' => $card_number,
       'exp_month' => $expiry_month,
@@ -204,7 +204,7 @@ function generateToken($card_number, $expiry_month, $expiry_year, $cvc) {
 
 // Subscription to send the invoice.
 function createSubscriptionForInvoice($customer, $subscriptionPlanId, $promo) {
-  $subscription = \Stripe\Subscription::create([
+  $subscription = Subscription::create([
     "customer" => $customer,
     "coupon" => $promo ? $promo : '',
     'collection_method' => 'send_invoice',
@@ -219,7 +219,7 @@ function createSubscriptionForInvoice($customer, $subscriptionPlanId, $promo) {
 
 // Subscription for automatically charging the user at the end of manage-billing.
 function createSubscriptionForAutoCollection($customer, $subscriptionPlanId, $promo) {
-  $subscription = \Stripe\Subscription::create([
+  $subscription = Subscription::create([
     "customer" => $customer,
     "coupon" => $promo ? $promo : '',
     'collection_method' => 'charge_automatically',

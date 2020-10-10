@@ -1,4 +1,11 @@
 <?php
+namespace StripePayment\Customer;
+
+require_once('../vendor/autoload.php');
+require_once('../lib/pdo_db.php');
+
+use Library\Database\Database;
+
   class Customer {
     private $db;
 

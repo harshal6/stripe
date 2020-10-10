@@ -1,8 +1,12 @@
 <?php
+namespace Library\Database;
 
-require_once('../admin/config/Config.php');
+require_once('../vendor/autoload.php');
 
-  /* 
+use Admin\Config\Config;
+use PDO;
+use PDOException;
+  /*
    *  PDO DATABASE CLASS
    *  Connects Database Using PDO
 	 *  Creates Prepeared Statements
@@ -10,25 +14,23 @@ require_once('../admin/config/Config.php');
 	 *  Returns rows and results
    */
 class Database {
-	private $host = $database['host'];
-	private $user = $database['username'];
-	private $pass = $database['password'];
-	private $dbname = $database['database'];
-	
-	private $dbh;
+    private $config;
+	private $db;
 	private $error;
 	private $stmt;
 	
 	public function __construct() {
+	   $this->config = new Config();
+	   $this->db = $this->config->db();
 		// Set DSN
-		$dsn = 'mysql:host=' . $this->host . ';dbname=' . $this->dbname;
+		$dsn = 'mysql:host=' . $this->db['host'] . ';dbname=' . $this->db['database'];
 		$options = array (
 			PDO::ATTR_PERSISTENT => true,
 			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION 
 		);
 		// Create a new PDO instanace
 		try {
-			$this->dbh = new PDO ($dsn, $this->user, $this->pass, $options);
+			$this->dbh = new PDO ($dsn, $this->db['username'], $this->db['password'], $options);
 		}		// Catch any errors
 		catch ( PDOException $e ) {
 			$this->error = $e->getMessage();
