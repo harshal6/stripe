@@ -105,22 +105,20 @@ if ($paymentType == 'cc') {
     
     // Create a manage-billing.
     $subscription =  createSubscriptionForAutoCollection($customer->id, $plan_type, $promo);
-    if ($POST['plan_type'] == "Individual") {
-        // Customer Data
-        $customerData = customerData($subscription->customer, $name, $email, $subscription->status, $paymentType, $type, $subscription->created);
-        // Instantiate Customer
-        $customer = new Customer();
-        // Add new customer
-        $customer->addCustomer($customerData);
-    }
-    if ($POST['plan_type'] == "Combined") {
-      $customer = new Customer();
-      $customerData = customerData($subscription->customer, $bname, $bemail, $subscription->status ,$paymentType, 'boy', $subscription->created);
-      $customer->addCustomer($customerData);
-      $customer = new Customer();
-      $customerData = customerData($subscription->customer, $gname, $gemail, $subscription->status ,$paymentType, 'girl', $subscription->created);
-      $customer->addCustomer($customerData);
-    }
+    $data = [
+      'name' => $name,
+      'email' => $email,
+      'bname' => $bname,
+      'gname' => $gname,
+      'bemail' => $bemail,
+      'gemail' => $gemail,
+      'subscription' => $subscription,
+      'paymentType' => $paymentType,
+      'plan_type' => $_POST['plan_type'],
+
+    ];
+    addCustomerDataWrapper($data);
+
 
       /**
      * Return to success Page if payment is successfull. 
@@ -145,14 +143,19 @@ else {
 
     // Create a manage-billing invoice. This will be finalised and sent by stripe after an hour or so.
     $subscription_invoice =  createSubscriptionForInvoice($customer, $plan_type, $promo);
+    $data = [
+          'name' => $name,
+          'email' => $email,
+          'bname' => $bname,
+          'gname' => $gname,
+          'bemail' => $bemail,
+          'gemail' => $gemail,
+          'subscription' => $subscription_invoice,
+          'paymentType' => $paymentType,
+          'plan_type' => $_POST['plan_type'],
 
-    $customerData = customerData ($subscription_invoice->customer, $name, $email, $subscription_invoice->status,$paymentType, $type, $subscription_invoice->created);
-      // Instantiate Customer
-    $customer = new Customer();
-    
-    // Add new customer
-    $customer->addCustomer($customerData);
-
+    ];
+    addCustomerDataWrapper($data);
     if($subscription_invoice->status == "active") {
       $message = "Invoice has been sent";
       onSuccess($message);
@@ -163,6 +166,29 @@ else {
     header("Location:../create-account?Message={$e->getMessage()}");
   }
   
+}
+
+function addCustomerDataWrapper($data) {
+  $payment_type = ($data['paymentType'] == 'cc') ? 0 : 1;
+  if ($data['plan_type'] == "Individual") {
+    // Customer Data
+    // 0 for individual
+    $customerData = customerData($data['subscription']->customer, $data['name'], $data['email'], $data['subscription']->status, $payment_type, 0, $data['subscription']->created);
+    // Instantiate Customer
+    $customer = new Customer();
+    // Add new customer
+    $customer->addCustomer($customerData);
+  }
+  if ($data['plan_type'] == "Combined") {
+    $customer = new Customer();
+    //2 for boy
+    $customerData = customerData($data['subscription']->customer, $data['bname'], $data['bemail'], $data['subscription']->status ,$payment_type, 2, $data['subscription']->created);
+    $customer->addCustomer($customerData);
+    $customer = new Customer();
+    //1 for girl
+    $customerData = customerData($data['subscription']->customer, $data['gname'], $data['gemail'], $data['subscription']->status ,$payment_type, 1, $data['subscription']->created);
+    $customer->addCustomer($customerData);
+  }
 }
 
 // Set customer data
