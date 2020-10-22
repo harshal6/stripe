@@ -1,6 +1,6 @@
 <?php
 namespace Library\DatabaseMysqli;
-require_once('../vendor/autoload.php');
+require_once( $_SERVER['DOCUMENT_ROOT']	.'admin/config/Config.php');
 
 use Admin\Config\Config;
 
@@ -35,7 +35,8 @@ class DatabaseMysqli
       return $this->dbh->prepare($query);
     }
     public function query($query) {
-        return $this->dbh->query($query);
+        $result = $this->dbh->query($query);
+        return $result;
     }
 //
 //    // Execute the prepared statement
