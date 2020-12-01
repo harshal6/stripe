@@ -170,10 +170,11 @@ else {
 
 function addCustomerDataWrapper($data) {
   $payment_type = ($data['paymentType'] == 'cc') ? 0 : 1;
+  $payment_status = ($data['paymentType'] == 'invoice') ? 'unpaid' : $data['subscription']->status;
   if ($data['plan_type'] == "Individual") {
     // Customer Data
     // 0 for individual
-    $customerData = customerData($data['subscription']->customer, $data['name'], $data['email'], $data['subscription']->status, $payment_type, 0, $data['subscription']->created);
+    $customerData = customerData($data['subscription']->customer, $data['name'], $data['email'], $payment_status, $payment_type, 0, $data['subscription']->created);
     // Instantiate Customer
     $customer = new Customer();
     // Add new customer
@@ -182,17 +183,17 @@ function addCustomerDataWrapper($data) {
   if ($data['plan_type'] == "Combined") {
     $customer = new Customer();
     //2 for boy
-    $customerData = customerData($data['subscription']->customer, $data['bname'], $data['bemail'], $data['subscription']->status ,$payment_type, 2, $data['subscription']->created);
+    $customerData = customerData($data['subscription']->customer, $data['bname'], $data['bemail'], $payment_status ,$payment_type, 2, $data['subscription']->created);
     $customer->addCustomer($customerData);
     $customer = new Customer();
     //1 for girl
-    $customerData = customerData($data['subscription']->customer, $data['gname'], $data['gemail'], $data['subscription']->status ,$payment_type, 1, $data['subscription']->created);
+    $customerData = customerData($data['subscription']->customer, $data['gname'], $data['gemail'], $payment_status ,$payment_type, 1, $data['subscription']->created);
     $customer->addCustomer($customerData);
   }
 }
 
 // Set customer data
-function customerData ($customerID, $name, $email, $status, $paymentType, $type, $created){
+function customerData ($customerID, $name, $email, $status, $paymentType, $type, $created) {
   $customerData = [
     'customer_id' => $customerID,
     'name' => $name,
